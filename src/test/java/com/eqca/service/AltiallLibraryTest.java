@@ -1,6 +1,6 @@
 package com.eqca.service;
 
-import com.altiall.common.code.eqcaCommonCode;
+import com.altiall.common.code.OrcaCommonCode;
 import com.altiall.convert.Converter;
 import com.altiall.plc.mitsubishi.format.MelsecQFormat;
 import com.altiall.plc.mitsubishi.format.MelsecSeries;
