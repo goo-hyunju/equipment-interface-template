@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eqca.repository.mapper.a.equipment.EquipmentMapper">
+
+	<select id="selectMdDeviceCtrl" parameterType="java.util.Map" resultType="com.eqca.repository.dto.entity.MdDeviceCtrl">
+		SELECT
+			a.cfg_code,
+			max(a.cfg_name) as cfg_name,
+			max(a.cfg_model) as cfg_model,
+			max(a.ctrl_ip) as ctrl_ip,
+			max(a.ctrl_port) as ctrl_port,
+			max(a.inf_type) as inf_type,
+			max(a.inf_model) as inf_model,
+			max(a.comm_code) as comm_code,
+			max(a.comm_desc) as comm_desc,
+			max(a.use_yn) as use_yn,
+			max(a.create_date) as create_date,
+			max(a.update_date) as update_date,
+			max(b.data_type) as data_type
+		FROM md_device_ctrl a
+		left outer join md_device_ctrl_melsec b on a.cfg_code = b.cfg_code
+		group by  a.cfg_code
+	</select>
+
+	<select id="selectMdDeviceCtrlMelsec" parameterType="java.util.Map" resultType="com.eqca.repository.dto.entity.MdDeviceCtrlMelsec">
+		SELECT
+			cfg_code,
+			memory_type,
+			read_addr,
+			read_count,
+			data_type
+		FROM md_device_ctrl_melsec
+		where cfg_code = #{cfgCode}
+	</select>
+
+	<select id="selectMdDeviceByCfgCode" parameterType="java.util.Map" resultType="com.eqca.repository.dto.entity.MdDevice">
+		select *
+		from md_device
+		where cfg_code = #{cfgCode}
+	</select>
+		
+
+</mapper>
+

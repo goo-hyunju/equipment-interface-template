@@ -1,0 +1,58 @@
+Configuration:
+  name: Default
+  status: warn
+
+  Properties:
+    Property:
+      - name: log-path
+        value: ./logs
+      - name: archive
+        value: ${log-path}/archive
+      - name: console-pattern
+        value: "%d{DEFAULT} %highlight{%5level} %style{${sys:PID}}{magenta} %style{%5.5tid}{Underline} [%style{%15.15thread}{Underline}] [%style{%25.25c{1.}:%4line}{FG_Cyan}] : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"
+      - name: file-pattern
+        value: "%d{DEFAULT} %5level ${sys:PID} %5.5tid [%20.20thread] [%25.25c{1.}:%4line] : %m%n$"
+
+  Appenders:
+    Console:
+      name: consoleAppender
+      target: SYSTEM_OUT
+      PatternLayout:
+        pattern: ${console-pattern}
+        charset: UTF-8
+        disableAnsi: false
+    RollingFile:
+      - name: rollingFileAppender
+        fileName: ${log-path}/orca-app.log
+        filePattern: ${log-path}/archive/orca-app.log.%d{yyyy-MM-dd}-%i.log
+        PatternLayout:
+          pattern: ${file-pattern}
+          charset: euc-kr
+        Policies:
+          TimeBasedTriggeringPolicy:
+            Interval: 1
+            modulate: true
+        DefaultRollOverStrategy:
+          Delete:
+            basePath: ${log-path}/archive
+            maxDepth: 1
+            IfAccumulatedFileCount:
+              exceeds: 31
+  Loggers:
+    Root:
+      level: info
+      AppenderRef:
+        - ref: consoleAppender
+        - ref: rollingFileAppender
+    Logger:
+      - name: com.altiall
+        level: DEBUG
+        additivity: true
+        
+      - name: org.springframework
+        level: WARN
+        additivity: true
+
+      - name: com.eqca
+        level: INFO
+        additivity: true

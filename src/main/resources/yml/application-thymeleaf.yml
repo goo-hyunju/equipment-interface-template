@@ -1,0 +1,5 @@
+spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false # thymeleaf에 대한 캐시를 남기지 않는다. cache=false 설정(운영시는 true)

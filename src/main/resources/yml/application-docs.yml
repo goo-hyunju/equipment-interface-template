@@ -1,0 +1,16 @@
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    path: /swagger
+    enabled: true
+    tagsSorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+    enable-url-templating: true
+  openapi:
+    customiser:
+      info:
+        title: "REST API "
+        description: "Specifications"
+        version: "1.0.0"

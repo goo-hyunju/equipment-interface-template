@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html
+  lang="ko"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <title>ORCA Template</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+  </head>
+
+  <script>
+    const domain = "http://localhost:8080";
+    // const domain = "";
+
+    const getTasks = async () => {
+      const response = await fetch(`${domain}/api/system/tasks`, {
+        method: "post",
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const responseBody = await response.json();
+      console.log("responseBody", responseBody);
+
+      const tableBody = document.getElementById("table-body");
+      tableBody.innerHTML = "";
+
+      for (const [key, value] of Object.entries(responseBody.data)) {
+        const row = `
+          <tr>
+            <td></td>
+            <td>${key}</td>
+            <td>${value}</td>
+            <td class="col-md-3">
+              <div class="input-group">
+                <select id="interval-${key}" class="form-select form-select-sm" aria-label="Interval Time" aria-describedby="button-addon2">
+                  <option value="1000">1 second</option>
+                  <option value="2000">2 second</option>
+                  <option value="3000" selected>3 second</option>
+                  <option value="4000">4 second</option>
+                  <option value="5000">5 second</option>
+                </select>
+                <button class="btn btn-outline-primary btn-sm" type="button" id="button-addon2" onClick="startTask('${key}')">Start</button>
+              </div>
+            </td>
+            <td><button type="button" class="btn btn-outline-primary btn-sm" onClick="stopTask('${key}')">Stop</button></td>
+          </tr>`;
+        tableBody.insertAdjacentHTML("beforeend", row);
+      }
+    };
+
+    async function startTask(taskId) {
+      const params = new URLSearchParams({
+        taskId: taskId,
+        intervalMillis: document.getElementById(`interval-${taskId}`).value,
+      });
+
+      const response = await fetch(
+        `${domain}/api/system/tasks/start?${params.toString()}`,
+        {
+          method: "post",
+        }
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      } else {
+        getTasks();
+      }
+    }
+
+    async function stopTask(taskId) {
+      const params = new URLSearchParams({
+        taskId: taskId,
+      });
+
+      const response = await fetch(
+        `${domain}/api/system/tasks/stop?${params.toString()}`,
+        {
+          method: "post",
+        }
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      } else {
+        getTasks();
+      }
+    }
+
+    async function testMessage(locale) {
+      console.log("locale", locale);
+      const response = await fetch(`${domain}/api/master/biz/test`, {
+        headers: {
+          "Accept-language": locale == "ko" ? "ko-KR" : "en-ER",
+        },
+        method: "post",
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        console.log("data", data);
+        const spanEl = document.getElementById(`${locale}-message`);
+        spanEl.innerHTML = data.message;
+
+        throw new Error(`HTTP error! status: ${response.status}`);
+      } else {
+      }
+    }
+
+    async function getBiz() {
+      const response = await fetch(`${domain}/api/master/biz`, {
+        headers: {
+          "Accept-language": "en-ER",
+        },
+        method: "post",
+      });
+      console.log("response", response);
+
+      const data = await response.json();
+      console.log("data", data);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      getTasks();
+    });
+  </script>
+  <body>
+    <div class="container-sm">
+      <div>
+        <button
+          type="button"
+          class="btn btn-outline-primary btn-sm"
+          onClick="getBiz()"
+        >
+          GET BIZ
+        </button>
+      </div>
+      <div>
+        <button
+          type="button"
+          class="btn btn-outline-primary btn-sm"
+          onClick="testMessage('ko')"
+        >
+          KO Exception Message
+        </button>
+        <span id="ko-message"></span>
+      </div>
+      <div>
+        <button
+          type="button"
+          class="btn btn-outline-primary btn-sm"
+          onClick="testMessage('en')"
+        >
+          EN Exception Message
+        </button>
+        <span id="en-message"></span>
+      </div>
+    </div>
+    <div class="container-sm">
+      <table class="table table-hover caption-top">
+        <caption>
+          Task List
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Task Id</th>
+            <th scope="col">Status</th>
+            <th scope="col">Start</th>
+            <th scope="col">Stop</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <!-- <tr th:each="prod: ${allProducts}">
+            <td th:text="${prod.name}">Oranges</td>
+            <td th:text="${#numbers.formatDecimal(prod.price, 1, 2)}">0.99</td>
+          </tr> -->
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

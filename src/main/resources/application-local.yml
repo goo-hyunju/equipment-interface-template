@@ -1,0 +1,24 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    a:
+      driver-class-name: org.postgresql.Driver
+      jdbc-url: jdbc:postgresql://49.247.206.107:8001/orca_wcs?currentSchema=orca_core
+      username: root
+      password: Altiall#000#
+      maximum-pool-size: 3
+      pool-name: HikariCP
+    b:
+      driver-class-name: org.postgresql.Driver
+      jdbc-url: jdbc:postgresql://49.247.206.107:8001/orca_wcs?currentSchema=orca_core
+      username: root
+      password: Altiall#000#
+      maximum-pool-size: 3
+      pool-name: HikariCP
+
+flow-control-app:
+  adapter-interface-app: "http://localhost:8101/adapter-inf"
+  biz-interface-app: "http://localhost:8102"
+  plan-manager-app: "http://localhost:8105"

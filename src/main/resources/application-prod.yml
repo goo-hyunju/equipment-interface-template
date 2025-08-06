@@ -1,0 +1,24 @@
+spring:
+  config:
+    activate:
+      on-profile: prod      
+  datasource:
+    a:
+      driver-class-name: org.postgresql.Driver
+      jdbc-url: jdbc:postgresql://61.101.55.222:8001/glab_wcs?currentSchema=wcs_standard
+      username: root
+      password: altiall!000@
+      maximum-pool-size: 3
+      pool-name: HikariCP
+    b:
+      driver-class-name: org.postgresql.Driver
+      jdbc-url: jdbc:postgresql://61.101.55.222:8001/glab_wcs?currentSchema=public
+      username: root
+      password: altiall!000@
+      maximum-pool-size: 3
+      pool-name: HikariCP
+
+flow-control-app:
+  adapter-interface-app: "http://192.168.0.14:8101/adapter-inf"
+  biz-interface-app: "http://192.168.0.14:8102"
+  plan-manager-app: "http://192.168.0.14:8105"

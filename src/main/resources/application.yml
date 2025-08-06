@@ -1,0 +1,47 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: equipment-interface-template
+  config:
+    import:
+      - classpath:/yml/application-docs.yml
+      - classpath:/yml/application-thymeleaf.yml
+  main:
+    allow-bean-definition-overriding: true
+  output:
+    ansi:
+      enabled: always
+  devtools:
+    livereload:
+      enabled: true
+
+server:
+  port: 8080
+  servlet:
+    encoding:
+      enabled: true
+      force: true
+  error:
+    include-stacktrace: never
+    path: '/error'
+  tomcat:
+    basedir: .
+    accesslog:
+      enabled: true
+      directory: logs/access
+      prefix: orca-access
+      file-data-format: yyyy-mm-dd
+      max-days: 30
+      pattern: "%{yyyy-MM-dd HH:mm:ss}t [%I] '%r' %s\t %a\t %A:%p\t %bbyte\t %q %{User-Agent}i\t %{Referer}i\t"
+
+jasypt:
+  encryptor:
+    password: secret-key
+
+logging:
+  level:
+    equipment-interface-template: DEBUG
+    equipment-interface-template.controller.lower.melsecplc: TRACE
+  config: classpath:log4j2.yml
+

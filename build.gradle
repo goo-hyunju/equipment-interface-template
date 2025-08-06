@@ -1,0 +1,145 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.2'
+	id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.eqca'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '21'
+}
+
+repositories {
+	mavenCentral()
+	maven { url "https://plugins.gradle.org/m2"}
+}
+
+ext {
+	set('snippetsDir', file("build/generated-snippets"))
+}
+
+configurations {
+	asciidoctorExt
+
+	configureEach {
+		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+	}
+
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+
+sourceSets{
+	main{
+		resources{
+			srcDirs =  ["$projectDir/src/main/resources"]
+		}
+	}
+}
+
+bootJar{
+	archivesBaseName = 'orca'
+	archiveFileName = 'equipment-interface-templatejar'
+	archiveVersion = "0.0.1"
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+}
+
+dependencies {
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+	implementation 'org.springframework.boot:spring-boot-starter-log4j2:3.4.0'
+	implementation 'org.springframework.boot:spring-boot-starter-websocket:3.4.0'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+	// sercurity todo sercurity 적용
+	//implementation 'org.springframework.boot:spring-boot-starter-security'
+	//implementation 'org.springframework.security:spring-security-test'
+
+	// Jasypt todo 라이선스 암호화,복호화
+	//implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
+
+	// https://github.com/spring-projects/spring-integration-samples/tree/main/basic/tcp-client-server
+	implementation 'org.springframework.boot:spring-boot-starter-integration'
+	implementation 'org.springframework.integration:spring-integration-ip'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// log4j2 using yml
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.3'
+
+	// https://springdoc.org/
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.3'
+
+	// https://netty.io/downloads.html
+	implementation 'io.netty:netty-all:4.1.98.Final'
+
+	// lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+
+	// database
+	implementation 'org.postgresql:postgresql:42.7.2'
+
+	// https://mybatis.org/spring-boot-starter/mybatis-spring-boot-autoconfigure/
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
+
+	implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
+
+	// 외부 jar 등록
+	implementation fileTree(dir: 'libs', includes: ['*.jar'])
+//	 implementation files('libs/altiall-library-1.0.0.jar')
+
+	//OPCUA Milo
+    implementation 'org.eclipse.milo:sdk-client:0.6.14' // OPC UA 클라이언트
+    implementation 'org.eclipse.milo:sdk-server:0.6.14' // OPC UA 서버
+}
+
+test {
+	jvmArgs += ["-javaagent:${configurations.testRuntimeClasspath.find { it.name.contains("mockito-inline") }}"]
+}
+
+// =========================================================
+// Javadoc 생성 설정 시작
+// =========================================================
+javadoc {
+    // Javadoc을 생성할 소스 파일 지정
+    // Lombok을 사용하고 있다면, lombok이 처리한 소스를 Javadoc이 사용하도록 설정하는 것이 중요합니다.
+    source = sourceSets.main.allJava
+    
+    // Javadoc HTML 파일이 생성될 경로를 명시적으로 지정합니다.
+    // 이 경로는 .gitlab-ci.yml의 `artifacts.paths` 및 `cp -r` 명령의 소스 경로와 정확히 일치해야 합니다.
+    destinationDir = file("${buildDir}/docs/javadoc")
+
+    options {
+        // Javadoc 문서의 인코딩을 UTF-8로 설정하여 한글 주석이 깨지는 것을 방지합니다.
+        encoding "UTF-8"
+        charSet "UTF-8"
+        docEncoding "UTF-8"
+
+        // HTML5 표준을 따르는 Javadoc을 생성합니다.
+        addBooleanOption('html5', true)
+
+        // ⭐ 가장 중요: Javadoc 경고를 무시하고 빌드를 계속하도록 설정합니다.
+        // CI/CD 환경에서 발생하는 대부분의 Javadoc 빌드 실패는 'doclint' 경고 때문입니다.
+        addStringOption('Xdoclint:none', '-quiet')
+        
+        // (선택 사항) 외부 의존성의 Javadoc에 링크를 걸고 싶다면 추가합니다.
+        // links = ["https://docs.spring.io/spring-boot/docs/current/api/", "https://docs.spring.io/spring-framework/docs/current/javadoc-api/"]
+    }
+}
+// =========================================================
+// Javadoc 생성 설정 끝
+// =========================================================
